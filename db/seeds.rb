@@ -5,6 +5,29 @@
 # Enough clicks to actually scroll through several pages in development.
 DEMO_CLICKS = 250
 
+# Two accounts in one organization, so the member list and the role selector
+# have something to show. Same reasoning as the clicks below: development only,
+# because seeded rows survive the per-example transaction and would show up in
+# the test suite.
+if Rails.env.development?
+  demo_password = 'templatus'
+
+  founder = User.find_or_create_by!(email: 'founder@templatus.test') { |user| user.password = demo_password }
+  colleague = User.find_or_create_by!(email: 'colleague@templatus.test') { |user| user.password = demo_password }
+
+  organization = Organization.find_or_create_by!(name: 'Acme Inc')
+
+  # Membership is tenant-scoped, so both the lookup and the insert need the
+  # organization to be the current tenant - `require_tenant` would raise
+  # otherwise, seeds included.
+  ActsAsTenant.with_tenant(organization) do
+    Membership.find_or_create_by!(user: founder) { |membership| membership.role = :admin }
+    Membership.find_or_create_by!(user: colleague) { |membership| membership.role = :member }
+  end
+
+  Rails.logger.info "Seeded #{organization.name} with #{founder.email} (admin) and #{colleague.email} (member)"
+end
+
 # Development only: seeding the test database would leak these records into
 # the test suite, because they survive the per-example transaction rollback.
 if Rails.env.development? && Click.count < DEMO_CLICKS
