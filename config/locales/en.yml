@@ -32,3 +32,37 @@ en:
     create:
       success: Click was successfully recorded.
       fail: Click recording failed!
+
+  organizations:
+    create:
+      success: Organization created. You are its first admin.
+
+  organization_settings:
+    update:
+      success: Settings saved.
+
+  memberships:
+    create:
+      success: '%{email} is now a member.'
+      unknown_user: Nobody has signed up with that address yet.
+    update:
+      success: Role updated.
+    destroy:
+      success: Membership removed.
+
+  tenant:
+    role_required: You do not have access to that part of this organization.
+
+  activerecord:
+    errors:
+      models:
+        organization:
+          attributes:
+            name:
+              no_slug: must contain at least one letter or digit to build an address from
+        membership:
+          attributes:
+            base:
+              last_admin: An organization needs at least one admin, and this is the last one.
+            role:
+              last_admin: cannot be changed - an organization needs at least one admin
