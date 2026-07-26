@@ -22,6 +22,8 @@ There are two sister repositories:
 - [ActionCable](https://guides.rubyonrails.org/action_cable_overview.html) for WebSocket communication
 - [PostgreSQL](https://www.postgresql.org/) for using as SQL database
 - [Sidekiq](https://sidekiq.org/) for background processing
+- [Devise](https://github.com/heartcombo/devise) for authentication (sign up, sign in, password reset, account deletion)
+- [acts_as_tenant](https://github.com/ErwinM/acts_as_tenant) for multitenancy: organizations with members, roles, and every tenant-scoped query narrowed to the organization in the URL
 - [Pagy](https://ddnexus.github.io/pagy/) with keyset (cursor) pagination for endless scrolling with constant query time
 - [Redis](https://redis.io/) for Caching, ActionCable, and Sidekiq, each on its own database
 
@@ -78,6 +80,42 @@ There are two sister repositories:
 - Gzip and Brotli compression of dynamic responses (HTML, JSON) using [Rack::Deflater](https://github.com/rack/rack/blob/master/lib/rack/deflater.rb), [Rack::Brotli](https://github.com/marcotc/rack-brotli)
 - Fine-tuned Content Security Policy (CSP)
 - Ready for PWA (manifest, service-worker)
+
+## Multitenancy
+
+The public click demo stays public. Everything behind a sign-in belongs to an organization, and which
+organization that is comes from the path:
+
+```
+/organizations              pick one, or create one (no tenant yet)
+/org/acme-inc               dashboard
+/org/acme-inc/memberships   members and their roles
+/org/acme-inc/settings/edit rename (admins only)
+```
+
+- **Path-based, not subdomain-based**, so development needs no wildcard DNS and no cookie-domain setup, and a
+  link can be pasted between members without losing its context. The segment accepts the slug or the numeric id.
+- **`TenantScoped`** ([app/controllers/concerns/tenant_scoped.rb](app/controllers/concerns/tenant_scoped.rb))
+  resolves the organization _through the signed-in user's memberships_, so an organization somebody else owns is
+  the same 404 as one that does not exist, and sets it as the acts_as_tenant tenant for the rest of the request.
+- **`require_tenant` is on**, so a query on a tenant-scoped model with no tenant set raises `NoTenantSet` instead
+  of quietly returning every organization's rows. Code that legitimately runs outside one organization - the
+  organization picker, the switcher in the header, the seeds - says so with `ActsAsTenant.without_tenant`.
+- **Roles** are `admin`, `member` and `viewer`, ordered. Controllers and views ask for a permission rather than
+  for a role - `require_permission :may_manage_members?`, `Current.membership.may_see_members?` - so which role
+  may do what is one edit in [app/models/membership.rb](app/models/membership.rb) rather than five files.
+  The last admin of an organization can neither be demoted nor removed.
+- **The slug is settled when the organization is created**, renames and direct writes alike leave it alone, so a
+  bookmarked `/org/acme-inc` keeps working for as long as the organization does.
+
+Adding a tenant-scoped model of your own is two lines: a `organization:references` column, and `acts_as_tenant
+:organization` in the model. From then on every query is narrowed to the current organization, and
+`Model.create!` fills in the organization by itself. Background jobs carry the tenant automatically through
+ActiveJob; plain `Sidekiq::Job` classes need `require 'acts_as_tenant/sidekiq'` (see
+[config/initializers/acts_as_tenant.rb](config/initializers/acts_as_tenant.rb)).
+
+In development, `bin/rails db:seed` creates `founder@templatus.test` (admin) and `colleague@templatus.test`
+(member) in an organization called Acme Inc, both with the password `templatus`.
 
 ## Metrics
 

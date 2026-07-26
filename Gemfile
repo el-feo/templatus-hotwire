@@ -20,6 +20,12 @@ gem 'view_component'
 # Fast pagination, used here in its keyset (cursor) flavor (https://ddnexus.github.io/pagy)
 gem 'pagy'
 
+# Flexible authentication solution for Rails with Warden. (https://github.com/heartcombo/devise)
+gem 'devise'
+
+# Multi-tenancy for Rails: scopes every query to the current organization (https://github.com/ErwinM/acts_as_tenant)
+gem 'acts_as_tenant'
+
 # Turns the raw user agent of a click into a readable browser and platform.
 # Ships with actionpack anyway, declared here because we use it directly.
 gem 'useragent'

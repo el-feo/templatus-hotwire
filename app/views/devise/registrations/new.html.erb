@@ -1,0 +1,38 @@
+<%= render PageTitle::Component.new('Create an account') do %>
+  An account of your own. Organizations come next - create one, or wait to be added to one.
+<% end %>
+
+<div class="bg-base-100 border-base-300 rounded-box mx-auto max-w-md border p-6">
+  <%= render 'devise/shared/error_messages', resource: resource %>
+
+  <%= form_with model: resource, as: resource_name, url: registration_path(resource_name) do |form| %>
+    <fieldset class="fieldset">
+      <%= form.label :email, class: 'fieldset-legend' %>
+
+      <%= form.email_field :email, class: 'input w-full', autofocus: true, autocomplete: 'email', required: true %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <%= form.label :password, class: 'fieldset-legend' %>
+
+      <%= form.password_field :password, class: 'input w-full', autocomplete: 'new-password', required: true %>
+
+      <% if @minimum_password_length %>
+        <p class="label"><%= @minimum_password_length %> characters minimum</p>
+      <% end %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <%= form.label :password_confirmation, class: 'fieldset-legend' %>
+
+      <%= form.password_field :password_confirmation,
+                              class: 'input w-full',
+                              autocomplete: 'new-password',
+                              required: true %>
+    </fieldset>
+
+    <%= form.submit 'Create account', class: 'btn btn-primary mt-4 w-full' %>
+  <% end %>
+
+  <%= render 'devise/shared/links' %>
+</div>

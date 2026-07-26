@@ -1,0 +1,49 @@
+<%= render PageTitle::Component.new('Members') do %>
+  Who can reach <%= Current.organization.name %>, and what they are allowed to do in it.
+<% end %>
+
+<% if Current.membership.may_manage_members? %>
+  <div class="bg-base-100 border-base-300 rounded-box mb-6 border p-4">
+    <%#
+      There is no invitation mail in this template: a member is added by the
+      address they signed up with, and has access from that moment on.
+    %>
+
+    <%= form_with url: organization_memberships_path(Current.organization),
+                  scope: :membership,
+                  id: 'add-member',
+                  class: 'flex flex-wrap items-end gap-3' do |form| %>
+      <fieldset class="fieldset grow">
+        <%= form.label :email, 'Add a member by email', class: 'fieldset-legend' %>
+
+        <%= form.email_field :email,
+                             class: 'input w-full',
+                             required: true,
+                             placeholder: 'person@example.com',
+                             autocomplete: 'off' %>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <%= form.label :role, class: 'fieldset-legend' %>
+
+        <%= form.select :role,
+                        Membership.role_options,
+                        { selected: 'member' },
+                        class: 'select' %>
+      </fieldset>
+
+      <%= form.submit 'Add member', class: 'btn btn-primary' %>
+    <% end %>
+  </div>
+<% end %>
+
+<%= render MemberList::Component.new(memberships: @memberships,
+                                     organization: Current.organization,
+                                     viewer: Current.membership) %>
+
+<div class="mt-8">
+  <%= link_to organization_root_path(Current.organization), class: 'btn btn-ghost btn-sm' do %>
+    <span class="icon-[lucide--arrow-left] size-4" aria-hidden="true"></span>
+    Back to <%= Current.organization.name %>
+  <% end %>
+</div>

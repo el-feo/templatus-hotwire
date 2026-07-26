@@ -1,0 +1,40 @@
+<%= render PageTitle::Component.new('Settings') do %>
+  Renaming <%= @organization.name %> only changes what people read, never where the organization lives.
+<% end %>
+
+<div class="bg-base-100 border-base-300 rounded-box mx-auto max-w-md border p-6">
+  <%= render FormErrors::Component.new(record: @organization) %>
+
+  <%= form_with model: @organization, url: organization_settings_path(@organization), method: :patch do |form| %>
+    <fieldset class="fieldset">
+      <%= form.label :name, class: 'fieldset-legend' %>
+
+      <%= form.text_field :name, class: 'input w-full', required: true, autofocus: true %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Address</legend>
+
+      <%#
+        Disabled rather than absent: the slug is what every bookmarked link
+        points at, so it is worth showing - and worth showing as unchangeable.
+      %>
+
+      <input
+        type="text"
+        class="input w-full"
+        value="/org/<%= @organization.slug %>"
+        autocomplete="off"
+        disabled
+      >
+
+      <p class="label text-pretty">Fixed when the organization was created, so existing links keep working.</p>
+    </fieldset>
+
+    <div class="mt-2 flex gap-3">
+      <%= form.submit 'Save changes', class: 'btn btn-primary' %>
+
+      <%= link_to 'Cancel', organization_root_path(@organization), class: 'btn btn-ghost' %>
+    </div>
+  <% end %>
+</div>

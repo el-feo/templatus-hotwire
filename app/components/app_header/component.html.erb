@@ -27,6 +27,12 @@
         <% t.with_tab text: 'About', href: helpers.about_path %>
       <% end %>
 
+      <%#
+        Current.organization is nil on the public pages, which is what makes the
+        menu show the account instead of an organization the visitor is not in.
+      %>
+      <%= render AccountMenu::Component.new(user: helpers.current_user, current_organization: Current.organization) %>
+
       <%= render ThemeToggle::Component.new %>
     </div>
   </div>

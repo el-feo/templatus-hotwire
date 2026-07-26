@@ -6,6 +6,13 @@ class ApplicationController < ActionController::Base
   # the explanatory public/406-unsupported-browser.html.
   allow_browser versions: :modern
 
+  # Signing in leads to the organization picker rather than to the public click
+  # demo - unless the user was already on their way somewhere else and Devise
+  # stashed that location before asking them to sign in.
+  def after_sign_in_path_for(resource)
+    stored_location_for(resource) || organizations_path
+  end
+
   def render_flash_update(notice: nil, alert: nil, status: :ok)
     render turbo_stream:
              turbo_stream.update(

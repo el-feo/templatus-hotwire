@@ -1,0 +1,36 @@
+<%= render PageTitle::Component.new('Set a new password') %>
+
+<div class="bg-base-100 border-base-300 rounded-box mx-auto max-w-md border p-6">
+  <%= render 'devise/shared/error_messages', resource: resource %>
+
+  <%= form_with model: resource, as: resource_name, url: password_path(resource_name), method: :put do |form| %>
+    <%= form.hidden_field :reset_password_token %>
+
+    <fieldset class="fieldset">
+      <%= form.label :password, 'New password', class: 'fieldset-legend' %>
+
+      <%= form.password_field :password,
+                              class: 'input w-full',
+                              autofocus: true,
+                              autocomplete: 'new-password',
+                              required: true %>
+
+      <% if @minimum_password_length %>
+        <p class="label"><%= @minimum_password_length %> characters minimum</p>
+      <% end %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <%= form.label :password_confirmation, 'Confirm new password', class: 'fieldset-legend' %>
+
+      <%= form.password_field :password_confirmation,
+                              class: 'input w-full',
+                              autocomplete: 'new-password',
+                              required: true %>
+    </fieldset>
+
+    <%= form.submit 'Change my password', class: 'btn btn-primary mt-4 w-full' %>
+  <% end %>
+
+  <%= render 'devise/shared/links' %>
+</div>

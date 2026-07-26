@@ -1,0 +1,15 @@
+<div role="alert" class="alert alert-error mb-6 items-start">
+  <span class="icon-[lucide--circle-alert] mt-0.5 size-5 shrink-0" aria-hidden="true"></span>
+
+  <div>
+    <p class="font-medium">
+      <%= pluralize(record.errors.size, 'error') %> stopped this from being saved
+    </p>
+
+    <ul class="mt-1 list-inside list-disc text-sm">
+      <% record.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>

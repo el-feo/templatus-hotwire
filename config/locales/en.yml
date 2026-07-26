@@ -32,3 +32,49 @@ en:
     create:
       success: Click was successfully recorded.
       fail: Click recording failed!
+
+  organizations:
+    create:
+      success: Organization created. You are its first admin.
+
+  organization_settings:
+    update:
+      success: Settings saved.
+
+  memberships:
+    create:
+      success: '%{email} is now a member.'
+      unknown_user: Nobody has signed up with that address yet.
+    update:
+      success: Role updated.
+    destroy:
+      success: Membership removed.
+
+  tenant:
+    role_required: You do not have access to that part of this organization.
+
+  # One entry per role in Membership::ROLES. A role added without one raises on
+  # the dashboard instead of being described as something it is not.
+  roles:
+    viewer:
+      description: Read-only, no changes of any kind
+    member:
+      description: Read and write, no member management
+    admin:
+      description: Can manage members and settings
+
+  activerecord:
+    errors:
+      models:
+        organization:
+          attributes:
+            name:
+              no_slug: must contain at least one letter or digit to build an address from
+            slug:
+              readonly: cannot be changed - it is the address the organization's members have bookmarked
+        membership:
+          attributes:
+            base:
+              last_admin: An organization needs at least one admin, and this is the last one.
+            role:
+              last_admin: cannot be changed - an organization needs at least one admin

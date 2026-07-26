@@ -1,0 +1,73 @@
+<% if user.nil? %>
+  <%= link_to 'Sign in', helpers.new_user_session_path, class: 'btn btn-ghost btn-sm' %>
+<% else %>
+  <%#
+    A native <details> rather than daisyUI's focus-based dropdown: it opens on
+    Enter and Space, closes on Escape and exposes its state to assistive
+    technology without a line of JavaScript.
+  %>
+  <details class="dropdown dropdown-end">
+    <summary class="btn btn-ghost btn-sm gap-2">
+      <span class="icon-[lucide--circle-user] size-5" aria-hidden="true"></span>
+
+      <%# The organization is what the user needs to see they are "in"; the account is secondary %>
+      <span class="hidden max-w-32 truncate sm:inline"><%= current_organization&.name || user.email %></span>
+    </summary>
+
+    <%#
+      role="menu" only permits menuitem* children, so the <li> must not
+      contribute a listitem role of its own.
+    %>
+
+    <ul
+      role="menu"
+      class="dropdown-content menu menu-sm bg-base-100 border-base-300 rounded-box z-50 mt-2 w-64 border p-2 shadow-lg"
+    >
+      <li class="menu-title truncate"><%= user.email %></li>
+
+      <% organizations.each do |organization| %>
+        <li role="none">
+          <%= link_to helpers.organization_root_path(organization),
+                      role: 'menuitem',
+                      class: ('menu-active' if current?(organization)) do %>
+            <span class="truncate"><%= organization.name %></span>
+
+            <% if current?(organization) %>
+              <span class="icon-[lucide--check] ml-auto size-4" aria-hidden="true"></span>
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+
+      <li role="none">
+        <%= link_to helpers.organizations_path, role: 'menuitem' do %>
+          <span class="icon-[lucide--building-2] size-4" aria-hidden="true"></span>
+          All organizations
+        <% end %>
+      </li>
+
+      <li role="none">
+        <%= link_to helpers.edit_user_registration_path, role: 'menuitem' do %>
+          <span class="icon-[lucide--settings] size-4" aria-hidden="true"></span>
+          Your account
+        <% end %>
+      </li>
+
+      <%#
+        Signing out changes state, so it is a form and not a link. button_to
+        builds the form; the classes make it sit in the menu like the items
+        above it.
+      %>
+
+      <li role="none">
+        <%= button_to helpers.destroy_user_session_path,
+                      method: :delete,
+                      class: 'w-full justify-start',
+                      form_class: 'w-full' do %>
+          <span class="icon-[lucide--log-out] size-4" aria-hidden="true"></span>
+          Sign out
+        <% end %>
+      </li>
+    </ul>
+  </details>
+<% end %>
