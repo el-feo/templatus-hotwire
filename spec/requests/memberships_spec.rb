@@ -106,6 +106,16 @@ describe 'Memberships' do
       expect(own_membership.reload).to be_admin
     end
 
+    it 'is not for members' do
+      sign_in_as(:member)
+      colleague = create_membership(organization:, role: :viewer)
+
+      patch organization_membership_path(organization, colleague), params: { membership: { role: 'admin' } }
+
+      expect(response).to redirect_to(organization_root_path(organization))
+      expect(colleague.reload).to be_viewer
+    end
+
     # acts_as_tenant scopes the lookup, so an id from elsewhere is a 404 rather
     # than somebody else's member.
     it 'cannot reach a membership of another organization' do
@@ -140,8 +150,18 @@ describe 'Memberships' do
       expect(own_membership.reload).to be_persisted
     end
 
-    # Removing your own membership is how you leave, and the member list you
-    # came from is not yours to see anymore.
+    it 'is not for viewers' do
+      sign_in_as(:viewer)
+      colleague = create_membership(organization:)
+
+      delete organization_membership_path(organization, colleague)
+
+      expect(response).to redirect_to(organization_root_path(organization))
+      expect(ActsAsTenant.with_tenant(organization) { Membership.exists?(colleague.id) }).to be(true)
+    end
+
+    # An admin removing their own membership is how they leave, and the member
+    # list they came from is not theirs to see anymore.
     it 'sends you back to the picker when you remove yourself' do
       sign_in_as(:admin)
       create_membership(organization:, role: :admin)

@@ -53,6 +53,16 @@ en:
   tenant:
     role_required: You do not have access to that part of this organization.
 
+  # One entry per role in Membership::ROLES. A role added without one raises on
+  # the dashboard instead of being described as something it is not.
+  roles:
+    viewer:
+      description: Read-only, no changes of any kind
+    member:
+      description: Read and write, no member management
+    admin:
+      description: Can manage members and settings
+
   activerecord:
     errors:
       models:
@@ -60,6 +70,8 @@ en:
           attributes:
             name:
               no_slug: must contain at least one letter or digit to build an address from
+            slug:
+              readonly: cannot be changed - it is the address the organization's members have bookmarked
         membership:
           attributes:
             base:

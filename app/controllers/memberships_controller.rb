@@ -35,8 +35,10 @@ class MembershipsController < ApplicationController
 
   def destroy
     if @membership.destroy
-      # Removing your own membership is how you leave an organization - the
-      # member list you came from is not yours to see anymore.
+      # An admin removing their own membership is how they leave - the member
+      # list they came from is not theirs to see anymore. Members and viewers
+      # have no way out of an organization in this template: leaving would be
+      # its own action, since only `may_manage_members?` gets this far.
       redirect_to after_destroy_path, notice: t('.success'), status: :see_other
     else
       redirect_to organization_memberships_path(Current.organization),

@@ -31,8 +31,14 @@ describe 'Multitenancy' do
       click_on 'Add member'
     end
 
+    # The flash only says the membership was saved; the list is what proves it
+    # rendered, with the role the form actually asked for.
     expect(page).to have_css('#flash', text: 'colleague@example.com is now a member')
-    expect(page).to have_text('colleague@example.com')
+
+    within('ul.list') do
+      expect(page).to have_text('colleague@example.com')
+      expect(page).to have_select('Role of colleague@example.com', selected: 'Viewer')
+    end
   end
 
   it 'keeps one organization out of the other' do

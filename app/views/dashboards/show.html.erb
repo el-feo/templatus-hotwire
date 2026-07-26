@@ -16,9 +16,7 @@
       <%= render RoleBadge::Component.new(role: Current.membership.role) %>
     </div>
 
-    <div class="stat-desc">
-      <%= Current.membership.admin? ? 'Can manage members and settings' : 'Read and write, no member management' %>
-    </div>
+    <div class="stat-desc"><%= Current.membership.role_description %></div>
   </div>
 
   <div class="stat">

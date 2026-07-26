@@ -14,35 +14,31 @@
                       url: helpers.organization_membership_path(organization, membership),
                       method: :patch,
                       class: 'flex items-center gap-2' do |form| %>
-          <%= form.label :role, "Role of #{membership.user.email}", class: 'sr-only' %>
+          <%#
+            Every row's form is scoped to `membership`, so the ids Rails derives
+            would be the same one over and over - and each row's label would
+            point at the first row's select.
+          %>
 
-          <%= form.select :role, role_options, {}, class: 'select select-sm w-28' %>
+          <%= form.label :role, "Role of #{membership.user.email}",
+                         class: 'sr-only',
+                         for: role_field_id(membership) %>
+
+          <%= form.select :role,
+                          role_options,
+                          {},
+                          class: 'select select-sm w-28',
+                          id: role_field_id(membership) %>
 
           <%= form.submit 'Save', class: 'btn btn-sm' %>
         <% end %>
-        <%#
-          Removing your own membership is how you leave, so the button says so -
-          and either way it asks first, because neither is undoable.
-        %>
         <%= button_to helpers.organization_membership_path(organization, membership),
                       method: :delete,
                       class: 'btn btn-ghost btn-sm text-error',
-                      form: {
-                        data: {
-                          turbo_confirm:
-                            if own?(membership)
-                              "Leave #{organization.name}?"
-                            else
-                              "Remove #{membership.user.email} from #{organization.name}?"
-                            end,
-                        },
-                      } do %>
-          <span
-            class="size-4 <%= own?(membership) ? 'icon-[lucide--log-out]' : 'icon-[lucide--user-minus]' %>"
-            aria-hidden="true"
-          ></span>
+                      form: { data: { turbo_confirm: confirm_text(membership) } } do %>
+          <span class="size-4 <%= remove_icon(membership) %>" aria-hidden="true"></span>
 
-          <span class="sr-only"><%= own?(membership) ? 'Leave' : "Remove #{membership.user.email}" %></span>
+          <span class="sr-only"><%= remove_label(membership) %></span>
         <% end %>
       <% else %>
         <%= render RoleBadge::Component.new(role: membership.role) %>

@@ -33,10 +33,17 @@ class Organization < ApplicationRecord
             uniqueness: true,
             format: { with: /\A[a-z0-9]+(-[a-z0-9]+)*\z/ }
 
-  before_validation :generate_slug, if: -> { slug.blank? }
+  before_validation :generate_slug, on: :create, if: -> { slug.blank? }
 
-  # URLs are built from the slug, but numeric ids stay valid so that links
-  # created before an organization had its current slug still resolve.
+  # The address an organization is reachable at is settled when it is created.
+  # Enforced on the model rather than by the one controller that happens to be
+  # careful with its strong parameters.
+  validate :slug_must_not_change, on: :update
+
+  # URLs are built from the slug, and the id keeps working alongside it: a
+  # deliberate second address for the places that only ever have an id to hand -
+  # a console session, a support link, a script - without them having to look
+  # the slug up first. Not a migration path, since the slug never changes.
   #
   # Called on a relation as well as on the class - `current_user.organizations
   # .from_param!(...)` narrows the lookup to the user's own organizations,
@@ -57,6 +64,10 @@ class Organization < ApplicationRecord
     return if name.parameterize.present?
 
     errors.add(:name, :no_slug)
+  end
+
+  def slug_must_not_change
+    errors.add(:slug, :readonly) if slug_changed?
   end
 
   # Generated once, on create, and then left alone: renaming an organization

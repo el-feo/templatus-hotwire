@@ -39,6 +39,25 @@ describe Organization do
       expect(organization.slug).to eq('acme-inc')
     end
 
+    # Not merely left alone by a rename: the address an organization is reached
+    # at is settled on create, whoever asks to change it afterwards.
+    it 'cannot be written directly once the organization exists' do
+      organization = create(:organization, name: 'Acme Inc')
+
+      expect(organization.update(slug: 'somewhere-else')).to be(false)
+      expect(organization.reload.slug).to eq('acme-inc')
+    end
+
+    # Blanking it used to regenerate it from the current name, which silently
+    # moved a renamed organization to a new address.
+    it 'is not regenerated when it is blanked out' do
+      organization = create(:organization, name: 'Acme Inc')
+      organization.update!(name: 'Acme Limited')
+
+      expect(organization.update(slug: '')).to be(false)
+      expect(organization.reload.slug).to eq('acme-inc')
+    end
+
     it 'is what the organization is identified by in URLs' do
       expect(create(:organization, name: 'Acme Inc').to_param).to eq('acme-inc')
     end

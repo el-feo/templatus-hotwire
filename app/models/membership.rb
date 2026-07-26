@@ -47,6 +47,12 @@ class Membership < ApplicationRecord
     ROLES.index(self.role) >= ROLES.index(role.to_s)
   end
 
+  # Three-valued by construction: a role added to ROLES without a description
+  # raises here instead of being silently described as something it is not.
+  def role_description
+    I18n.t("roles.#{role}.description")
+  end
+
   private
 
   def keep_one_admin

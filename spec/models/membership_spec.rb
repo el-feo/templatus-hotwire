@@ -77,6 +77,33 @@ describe Membership do
     expect(ActsAsTenant.with_tenant(organization) { build(:membership, organization:, user:) }).not_to be_valid
   end
 
+  # The other half of the same rule: uniqueness is scoped to the organization,
+  # so belonging to two of them is the ordinary case rather than a duplicate.
+  it 'allows a user a membership in every organization' do
+    user = create(:user)
+    other_organization = create(:organization)
+    create_membership(organization:, user:)
+
+    membership =
+      ActsAsTenant.with_tenant(other_organization) do
+        build(:membership, organization: other_organization, user:)
+      end
+
+    expect(membership).to be_valid
+  end
+
+  # A two-branch description of a three-valued concept told viewers they could
+  # write; the description belongs to the role now.
+  describe 'the role description' do
+    around { |example| ActsAsTenant.with_tenant(organization) { example.run } }
+
+    it 'covers every role in ROLES' do
+      described_class::ROLES.each do |role|
+        expect(build(:membership, organization:, role:).role_description).to be_present
+      end
+    end
+  end
+
   # An organization whose last admin is gone cannot be managed by anybody.
   describe 'the last admin' do
     let!(:admin) { create_membership(organization:, role: :admin) }

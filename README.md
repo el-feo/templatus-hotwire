@@ -103,6 +103,8 @@ organization that is comes from the path:
   organization picker, the switcher in the header, the seeds - says so with `ActsAsTenant.without_tenant`.
 - **Roles** are `admin`, `member` and `viewer`, ordered; `Current.membership.at_least?(:member)` compares them.
   The last admin of an organization can neither be demoted nor removed.
+- **The slug is settled when the organization is created**, renames and direct writes alike leave it alone, so a
+  bookmarked `/org/acme-inc` keeps working for as long as the organization does.
 
 Adding a tenant-scoped model of your own is two lines: a `organization:references` column, and `acts_as_tenant
 :organization` in the model. From then on every query is narrowed to the current organization, and

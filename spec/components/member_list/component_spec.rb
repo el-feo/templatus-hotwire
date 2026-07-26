@@ -13,6 +13,16 @@ describe MemberList::Component, type: :component do
     it { is_expected.to have_select('membership[role]', count: 2) }
     it { is_expected.to have_button('Save', count: 2) }
 
+    # Every row's form is scoped to `membership`, so the ids Rails derives are
+    # the same one over and over unless the component says otherwise - and a
+    # screen reader would read the first row's label for every select.
+    it 'gives each row a role select with an id of its own, and a label pointing at it' do
+      ids = output.css('select').pluck('id')
+
+      expect(ids.uniq).to eq(ids)
+      expect(output.css('label[class~="sr-only"]').pluck('for')).to match_array(ids)
+    end
+
     it 'marks the viewer as themselves' do
       expect(output).to have_text('You')
     end
