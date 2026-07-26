@@ -1,0 +1,22 @@
+<%= render PageTitle::Component.new('New organization') do %>
+  You become its first admin, and can add the rest of the team right after.
+<% end %>
+
+<div class="bg-base-100 border-base-300 rounded-box mx-auto max-w-md border p-6">
+  <%= render FormErrors::Component.new(record: @organization) %>
+
+  <%= form_with model: @organization do |form| %>
+    <fieldset class="fieldset">
+      <%= form.label :name, class: 'fieldset-legend' %>
+
+      <%= form.text_field :name, class: 'input w-full', required: true, autofocus: true %>
+
+      <p class="label text-pretty">
+        The address is built from the name: "Acme Inc" becomes /org/acme-inc, and stays that way if you rename the
+        organization later.
+      </p>
+    </fieldset>
+
+    <%= form.submit 'Create organization', class: 'btn btn-primary mt-2 w-full' %>
+  <% end %>
+</div>

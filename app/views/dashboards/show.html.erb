@@ -1,0 +1,50 @@
+<%= render PageTitle::Component.new(Current.organization.name) do %>
+  Everything under this address belongs to one organization. Members only ever see their own, because every
+  tenant-scoped query is narrowed to it before it reaches the database.
+<% end %>
+
+<div class="stats stats-vertical border-base-300 bg-base-100 sm:stats-horizontal w-full border">
+  <div class="stat">
+    <div class="stat-title">Members</div>
+    <div class="stat-value text-primary"><%= @members_count %></div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-title">Your role</div>
+
+    <div class="stat-value text-2xl">
+      <%= render RoleBadge::Component.new(role: Current.membership.role) %>
+    </div>
+
+    <div class="stat-desc">
+      <%= Current.membership.admin? ? 'Can manage members and settings' : 'Read and write, no member management' %>
+    </div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-title">Address</div>
+    <div class="stat-value truncate font-mono text-lg">/org/<%= Current.organization.slug %></div>
+    <div class="stat-desc">Stays the same when the organization is renamed</div>
+  </div>
+</div>
+
+<div class="mt-8 flex flex-wrap gap-3">
+  <% if Current.membership.at_least?(:member) %>
+    <%= link_to organization_memberships_path(Current.organization), class: 'btn btn-primary' do %>
+      <span class="icon-[lucide--users] size-4" aria-hidden="true"></span>
+      Members
+    <% end %>
+  <% end %>
+
+  <% if Current.membership.admin? %>
+    <%= link_to edit_organization_settings_path(Current.organization), class: 'btn' do %>
+      <span class="icon-[lucide--settings] size-4" aria-hidden="true"></span>
+      Settings
+    <% end %>
+  <% end %>
+
+  <%= link_to organizations_path, class: 'btn btn-ghost' do %>
+    <span class="icon-[lucide--arrow-left] size-4" aria-hidden="true"></span>
+    All organizations
+  <% end %>
+</div>

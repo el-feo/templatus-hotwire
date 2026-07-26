@@ -1,0 +1,52 @@
+<ul class="list bg-base-100 border-base-300 rounded-box border">
+  <% memberships.each do |membership| %>
+    <li class="list-row flex-wrap items-center gap-y-3">
+      <div class="min-w-0 grow">
+        <span class="truncate font-medium"><%= membership.user.email %></span>
+
+        <% if own?(membership) %>
+          <span class="badge badge-ghost badge-xs ms-1">You</span>
+        <% end %>
+      </div>
+
+      <% if manageable? %>
+        <%= form_with model: membership,
+                      url: helpers.organization_membership_path(organization, membership),
+                      method: :patch,
+                      class: 'flex items-center gap-2' do |form| %>
+          <%= form.label :role, "Role of #{membership.user.email}", class: 'sr-only' %>
+
+          <%= form.select :role, role_options, {}, class: 'select select-sm w-28' %>
+
+          <%= form.submit 'Save', class: 'btn btn-sm' %>
+        <% end %>
+        <%#
+          Removing your own membership is how you leave, so the button says so -
+          and either way it asks first, because neither is undoable.
+        %>
+        <%= button_to helpers.organization_membership_path(organization, membership),
+                      method: :delete,
+                      class: 'btn btn-ghost btn-sm text-error',
+                      form: {
+                        data: {
+                          turbo_confirm:
+                            if own?(membership)
+                              "Leave #{organization.name}?"
+                            else
+                              "Remove #{membership.user.email} from #{organization.name}?"
+                            end,
+                        },
+                      } do %>
+          <span
+            class="size-4 <%= own?(membership) ? 'icon-[lucide--log-out]' : 'icon-[lucide--user-minus]' %>"
+            aria-hidden="true"
+          ></span>
+
+          <span class="sr-only"><%= own?(membership) ? 'Leave' : "Remove #{membership.user.email}" %></span>
+        <% end %>
+      <% else %>
+        <%= render RoleBadge::Component.new(role: membership.role) %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

@@ -1,0 +1,63 @@
+<%= render PageTitle::Component.new('Your account') do %>
+  Changing the address you sign in with, or the password you sign in with.
+<% end %>
+
+<div class="bg-base-100 border-base-300 rounded-box mx-auto max-w-md border p-6">
+  <%= render 'devise/shared/error_messages', resource: resource %>
+
+  <%= form_with model: resource, as: resource_name, url: registration_path(resource_name), method: :put do |form| %>
+    <fieldset class="fieldset">
+      <%= form.label :email, class: 'fieldset-legend' %>
+
+      <%= form.email_field :email, class: 'input w-full', autocomplete: 'email', required: true %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <%= form.label :password, 'New password', class: 'fieldset-legend' %>
+
+      <%= form.password_field :password, class: 'input w-full', autocomplete: 'new-password' %>
+
+      <p class="label">Leave blank to keep the current one.</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <%= form.label :password_confirmation, class: 'fieldset-legend' %>
+
+      <%= form.password_field :password_confirmation, class: 'input w-full', autocomplete: 'new-password' %>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <%= form.label :current_password, class: 'fieldset-legend' %>
+
+      <%= form.password_field :current_password, class: 'input w-full', autocomplete: 'current-password', required: true %>
+
+      <p class="label">Confirms the changes above are yours.</p>
+    </fieldset>
+
+    <%= form.submit 'Save changes', class: 'btn btn-primary mt-4 w-full' %>
+  <% end %>
+</div>
+
+<div class="border-error/40 bg-base-100 rounded-box mx-auto mt-8 max-w-md border p-6">
+  <h2 class="font-medium">Delete this account</h2>
+
+  <%#
+    Memberships go with it: the foreign key cascades in the database, which is
+    why deleting an account works from here - outside of any organization.
+  %>
+
+  <p class="text-base-content/70 mt-1 text-sm text-pretty">
+    Your memberships are removed along with the account. Organizations you created stay, so make somebody else an admin
+    first if one still needs managing.
+  </p>
+
+  <%= button_to 'Delete account',
+                registration_path(resource_name),
+                method: :delete,
+                class: 'btn btn-error btn-outline btn-sm mt-4',
+                form: {
+                  data: {
+                    turbo_confirm: 'This cannot be undone. Delete your account?',
+                  },
+                } %>
+</div>

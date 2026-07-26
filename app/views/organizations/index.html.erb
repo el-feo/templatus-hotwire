@@ -1,0 +1,14 @@
+<%= render PageTitle::Component.new('Organizations') do %>
+  Every organization you are a member of. Each one keeps its own members and lives under its own URL.
+<% end %>
+
+<% if @organizations.any? %>
+  <div class="mb-4 flex justify-end">
+    <%= link_to new_organization_path, class: 'btn btn-primary btn-sm' do %>
+      <span class="icon-[lucide--plus] size-4" aria-hidden="true"></span>
+      New organization
+    <% end %>
+  </div>
+<% end %>
+
+<%= render OrganizationList::Component.new(organizations: @organizations) %>
