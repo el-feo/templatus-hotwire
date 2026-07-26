@@ -82,6 +82,8 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    acts_as_tenant (1.0.1)
+      rails (>= 6.0)
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     amazing_print (2.0.0)
@@ -90,6 +92,7 @@ GEM
       activesupport (>= 6.0.0)
     ast (2.4.3)
     base64 (0.3.0)
+    bcrypt (3.1.22)
     bigdecimal (4.1.2)
     bindex (0.8.1)
     bootsnap (1.24.6)
@@ -125,6 +128,12 @@ GEM
     debug (1.11.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    devise (5.0.4)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 7.0)
+      responders
+      warden (~> 1.2.3)
     diff-lcs (1.6.2)
     dotenv (3.2.0)
     drb (2.2.3)
@@ -260,6 +269,7 @@ GEM
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
+    orm_adapter (0.5.0)
     ostruct (0.6.3)
     pagy (43.6.1)
       json
@@ -365,6 +375,9 @@ GEM
       io-console (~> 0.5)
     request_store (1.7.0)
       rack (>= 1.4)
+    responders (3.2.0)
+      actionpack (>= 7.0)
+      railties (>= 7.0)
     rexml (3.4.4)
     rorvswild (1.12.0)
     rouge (4.7.0)
@@ -457,6 +470,8 @@ GEM
       actionview (>= 7.1.0)
       activesupport (>= 7.1.0)
       concurrent-ruby (~> 1)
+    warden (1.2.9)
+      rack (>= 2.0.9)
     web-console (4.3.0)
       actionview (>= 8.0.0)
       bindex (>= 0.4.0)
@@ -484,6 +499,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  acts_as_tenant
   amazing_print
   annotaterb
   bootsnap (>= 1.4.4)
@@ -492,6 +508,7 @@ DEPENDENCIES
   capybara
   capybara-playwright-driver
   debug
+  devise
   dotenv
   factory_bot_rails
   guard-rspec
