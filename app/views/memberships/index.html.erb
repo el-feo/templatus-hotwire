@@ -2,7 +2,7 @@
   Who can reach <%= Current.organization.name %>, and what they are allowed to do in it.
 <% end %>
 
-<% if Current.membership.admin? %>
+<% if Current.membership.may_manage_members? %>
   <div class="bg-base-100 border-base-300 rounded-box mb-6 border p-4">
     <%#
       There is no invitation mail in this template: a member is added by the
@@ -27,7 +27,7 @@
         <%= form.label :role, class: 'fieldset-legend' %>
 
         <%= form.select :role,
-                        Membership::ROLES.reverse.map { |role| [role.capitalize, role] },
+                        Membership.role_options,
                         { selected: 'member' },
                         class: 'select' %>
       </fieldset>

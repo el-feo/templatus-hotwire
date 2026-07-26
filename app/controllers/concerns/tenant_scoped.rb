@@ -10,6 +10,15 @@ module TenantScoped
     before_action :set_current_organization
   end
 
+  class_methods do
+    # Guards name the permission, never the role: which roles carry
+    # `may_manage_members?` is Membership's business, and changing that answer
+    # is a one-line edit there rather than a hunt through controllers and views.
+    def require_permission(permission, **)
+      before_action(**) { deny_unless(permission) }
+    end
+  end
+
   private
 
   # The lookup goes through the user's own memberships on purpose: a slug the
@@ -30,16 +39,8 @@ module TenantScoped
     Current.membership = current_user.memberships.find_by!(organization_id: organization.id)
   end
 
-  def require_admin
-    require_role(:admin)
-  end
-
-  def require_member
-    require_role(:member)
-  end
-
-  def require_role(role)
-    return if Current.membership.at_least?(role)
+  def deny_unless(permission)
+    return if Current.membership.public_send(permission)
 
     # 303, because this also answers non-GET requests, and Turbo only follows a
     # redirect away from a form submission when it sees See Other.

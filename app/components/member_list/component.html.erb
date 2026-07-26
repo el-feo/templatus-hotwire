@@ -25,7 +25,7 @@
                          for: role_field_id(membership) %>
 
           <%= form.select :role,
-                          role_options,
+                          Membership.role_options,
                           {},
                           class: 'select select-sm w-28',
                           id: role_field_id(membership) %>

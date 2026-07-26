@@ -17,16 +17,11 @@ class MemberList::Component < ViewComponent::Base
   attr_reader :memberships, :organization, :viewer
 
   def manageable?
-    viewer.admin?
+    viewer.may_manage_members?
   end
 
   def own?(membership)
     membership.user_id == viewer.user_id
-  end
-
-  # Most privileged first, so the select reads like the hierarchy it describes.
-  def role_options
-    Membership::ROLES.reverse_each.map { |role| [role.capitalize, role] }
   end
 
   def role_field_id(membership)

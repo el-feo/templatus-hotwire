@@ -92,12 +92,20 @@ describe Membership do
     expect(membership).to be_valid
   end
 
-  # A two-branch description of a three-valued concept told viewers they could
-  # write; the description belongs to the role now.
-  describe 'the role description' do
+  describe 'permissions' do
     around { |example| ActsAsTenant.with_tenant(organization) { example.run } }
 
-    it 'covers every role in ROLES' do
+    it 'lets admins manage members' do
+      expect(build(:membership, organization:, role: :admin)).to be_may_manage_members
+      expect(build(:membership, organization:, role: :member)).not_to be_may_manage_members
+    end
+
+    it 'lets members see the member list, but not viewers' do
+      expect(build(:membership, organization:, role: :member)).to be_may_see_members
+      expect(build(:membership, organization:, role: :viewer)).not_to be_may_see_members
+    end
+
+    it 'describes every role in ROLES' do
       described_class::ROLES.each do |role|
         expect(build(:membership, organization:, role:).role_description).to be_present
       end

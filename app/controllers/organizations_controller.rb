@@ -6,12 +6,11 @@ class OrganizationsController < ApplicationController
 
   # There is no tenant here by definition: this is where a signed-in user picks
   # one. The two queries that touch the tenant-scoped Membership model say so
-  # themselves rather than the whole request running untenanted, where a scoped
-  # query added later would quietly return every organization's rows instead of
-  # raising. `to_a` inside the block, because a relation would run its query
-  # later - from the template, with the tenant back.
+  # themselves - `all_organizations` and the block below - rather than the whole
+  # request running untenanted, where a scoped query added later would quietly
+  # return every organization's rows instead of raising.
   def index
-    @organizations = ActsAsTenant.without_tenant { current_user.organizations.order(:name).to_a }
+    @organizations = current_user.all_organizations
   end
 
   def new

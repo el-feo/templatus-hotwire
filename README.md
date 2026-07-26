@@ -101,7 +101,9 @@ organization that is comes from the path:
 - **`require_tenant` is on**, so a query on a tenant-scoped model with no tenant set raises `NoTenantSet` instead
   of quietly returning every organization's rows. Code that legitimately runs outside one organization - the
   organization picker, the switcher in the header, the seeds - says so with `ActsAsTenant.without_tenant`.
-- **Roles** are `admin`, `member` and `viewer`, ordered; `Current.membership.at_least?(:member)` compares them.
+- **Roles** are `admin`, `member` and `viewer`, ordered. Controllers and views ask for a permission rather than
+  for a role - `require_permission :may_manage_members?`, `Current.membership.may_see_members?` - so which role
+  may do what is one edit in [app/models/membership.rb](app/models/membership.rb) rather than five files.
   The last admin of an organization can neither be demoted nor removed.
 - **The slug is settled when the organization is created**, renames and direct writes alike leave it alone, so a
   bookmarked `/org/acme-inc` keeps working for as long as the organization does.

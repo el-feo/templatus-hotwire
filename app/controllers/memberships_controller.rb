@@ -1,8 +1,9 @@
 class MembershipsController < ApplicationController
   include TenantScoped
 
-  before_action :require_member, only: :index
-  before_action :require_admin, except: :index
+  require_permission :may_see_members?, only: :index
+  require_permission :may_manage_members?, except: :index
+
   before_action :set_membership, only: %i[update destroy]
 
   def index
@@ -51,8 +52,11 @@ class MembershipsController < ApplicationController
 
   # Nil when no account uses that address, which is the one failure the
   # membership itself cannot describe.
+  #
+  # No normalizing here: `normalizes :email` on User applies to `find_by` too,
+  # so this lookup and signing in agree on what an address is by construction.
   def build_membership
-    user = User.find_by(email: membership_params[:email].to_s.strip.downcase)
+    user = User.find_by(email: membership_params[:email])
 
     Membership.new(user:, role: membership_params[:role]) if user
   end
@@ -67,7 +71,7 @@ class MembershipsController < ApplicationController
   def load_memberships
     # Most privileged first, by an explicit CASE - ordering by the role column
     # would sort it alphabetically, which is only accidentally the same thing.
-    @memberships = Membership.includes(:user).in_order_of(:role, Membership::ROLES.reverse)
+    @memberships = Membership.includes(:user).in_order_of(:role, Membership.roles_by_privilege)
   end
 
   # `find` without a scope is safe here: acts_as_tenant restricts Membership to

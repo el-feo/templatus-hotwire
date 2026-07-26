@@ -43,6 +43,31 @@ class Membership < ApplicationRecord
   validate :keep_one_admin, on: :update
   before_destroy :abort_when_last_admin
 
+  # Most privileged first: the role selectors read like the hierarchy they
+  # describe, and ordering by the role column would only accidentally agree.
+  def self.roles_by_privilege
+    ROLES.reverse
+  end
+
+  def self.role_options
+    roles_by_privilege.map { |role| [role.capitalize, role] }
+  end
+
+  # What each role may do, named once here instead of at every call site. The
+  # app asks for the permission; that a role happens to imply it is this
+  # object's business.
+  def may_see_members?
+    at_least?(:member)
+  end
+
+  def may_manage_members?
+    at_least?(:admin)
+  end
+
+  def may_edit_settings?
+    at_least?(:admin)
+  end
+
   def at_least?(role)
     ROLES.index(self.role) >= ROLES.index(role.to_s)
   end

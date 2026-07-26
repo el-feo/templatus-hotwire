@@ -31,4 +31,18 @@ class User < ApplicationRecord
   # Membership with no tenant set and raise NoTenantSet.
   has_many :memberships, inverse_of: :user # rubocop:disable Rails/HasManyOrHasOneDependent
   has_many :organizations, through: :memberships
+
+  # Devise already treats addresses case- and whitespace-insensitively on write.
+  # Saying it here says it once and for the read path too: `normalizes` applies
+  # to `find_by(email:)`, so looking somebody up cannot drift from signing in.
+  normalizes :email, with: ->(email) { email.strip.downcase }
+
+  # The join goes through the tenant-scoped Membership, so listing somebody's
+  # organizations is a query that has to suspend tenancy - inside an
+  # organization it would otherwise come back holding only that one. Callers get
+  # an array rather than a relation: a relation would run its query later, when
+  # the tenant is back.
+  def all_organizations
+    ActsAsTenant.without_tenant { organizations.order(:name).to_a }
+  end
 end

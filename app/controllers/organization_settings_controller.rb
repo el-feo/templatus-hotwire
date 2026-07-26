@@ -1,7 +1,7 @@
 class OrganizationSettingsController < ApplicationController
   include TenantScoped
 
-  before_action :require_admin
+  require_permission :may_edit_settings?
 
   def edit
     @organization = Current.organization

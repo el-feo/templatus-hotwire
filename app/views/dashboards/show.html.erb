@@ -27,14 +27,14 @@
 </div>
 
 <div class="mt-8 flex flex-wrap gap-3">
-  <% if Current.membership.at_least?(:member) %>
+  <% if Current.membership.may_see_members? %>
     <%= link_to organization_memberships_path(Current.organization), class: 'btn btn-primary' do %>
       <span class="icon-[lucide--users] size-4" aria-hidden="true"></span>
       Members
     <% end %>
   <% end %>
 
-  <% if Current.membership.admin? %>
+  <% if Current.membership.may_edit_settings? %>
     <%= link_to edit_organization_settings_path(Current.organization), class: 'btn' do %>
       <span class="icon-[lucide--settings] size-4" aria-hidden="true"></span>
       Settings

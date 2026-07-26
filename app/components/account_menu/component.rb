@@ -11,13 +11,14 @@ class AccountMenu::Component < ViewComponent::Base
 
   attr_reader :user, :current_organization
 
-  # `without_tenant` matters twice here. On a public page there is no tenant at
-  # all, and the join through the tenant-scoped Membership would raise
-  # NoTenantSet. On an organization page there is one, and the same join would
-  # come back narrowed to the organization the user is already looking at -
-  # leaving the switcher with the single entry it exists to switch away from.
+  # `all_organizations` owns the tenancy question, which matters twice here: on
+  # a public page there is no tenant and the join through the tenant-scoped
+  # Membership would raise NoTenantSet, and on an organization page the same
+  # join would come back narrowed to the organization the user is already
+  # looking at - leaving the switcher with the single entry it exists to switch
+  # away from.
   def organizations
-    @organizations ||= ActsAsTenant.without_tenant { user.organizations.order(:name).to_a }
+    @organizations ||= user.all_organizations
   end
 
   def current?(organization)
