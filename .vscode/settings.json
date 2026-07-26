@@ -26,6 +26,8 @@
 
   "eslint.validate": ["javascript", "typescript"],
 
+  "githubPullRequests.remotes": ["origin"],
+
   "ruby.lint": {
     "rubocop": {
       "forceExclusion": true
